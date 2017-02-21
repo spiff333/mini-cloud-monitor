@@ -1,0 +1,38 @@
+{
+  "name": "mini-cloud-monitor",
+  "version": "0.9.0",
+  "description": "A NodeJS application that opens a USB serial connection to a RGB LED light, displaying AWS CloudWatch events triggered by AWS IoT MQTT events.",
+  "main": "app.js",
+  "scripts": {
+    "test": "jasmine-node spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spiff333/mini-cloud-monitor.git"
+  },
+  "keywords": [
+    "AWS",
+    "Arduino",
+    "LeoStick",
+    "BlinkM",
+    "serial",
+    "IoT",
+    "MQTT"
+  ],
+  "author": "Marc Plassmeier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spiff333/mini-cloud-monitor/issues"
+  },
+  "homepage": "https://github.com/spiff333/mini-cloud-monitor#readme",
+  "dependencies": {
+    "aws-iot-device-sdk": "^1.0.14",
+    "inquirer": "^3.0.1",
+    "jasmine-node": "^1.14.5",
+    "serialport": "^4.0.7",
+    "winston": "^2.3.1"
+  },
+  "devDependencies": {
+    "jasmine-node": "^1.14.5"
+  }
+}
