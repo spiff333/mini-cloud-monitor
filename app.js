@@ -20,7 +20,6 @@ const MQTT_TOPIC = 'miniCloudMonitorTopic';
 const MQTT_JSON_KEY = 'colour';
 
 const AWS_REGION = 'ap-southeast-2';
-const AWS_HOST = 'xxxxxxxxxxxxxx.iot.ap-southeast-2.amazonaws.com';
 
 const ALL_OK_STATUS_COLOUR = 'ffffff';
 const ERROR_STATUS_COLOUR = 'ff0000';
@@ -44,7 +43,7 @@ var device;
 var connectedToAws = false;
 function openMqttConnection() {
   device = awsiot.device({
-    host: AWS_HOST, region: AWS_REGION, protocol: 'wss', port: 443, debug: false,
+    clientId: 'MiniCloudMonitor-' + (Math.floor((Math.random() * 100000) + 1)), region: AWS_REGION, protocol: 'wss', port: 443, debug: false
   });
 
   device.on('connect', function() {
@@ -54,6 +53,7 @@ function openMqttConnection() {
   });
 
   device.on('message', function(topic, payload) {
+    console.log(payload.toString());
     if (port && topic == MQTT_TOPIC && payload) {
       var message = JSON.parse(payload);
       if (message.hasOwnProperty(MQTT_JSON_KEY)) {
@@ -67,7 +67,7 @@ function openMqttConnection() {
   device.on('close', function () {
     connectedToAws = false;
     winston.log('info', 'AWS IoT MQTT connection closed.');
-  })
+  });
 
   device.on('error', function (err) {
     device.end();
@@ -113,7 +113,7 @@ var questions = [{
     },
     filter: function(value) {
       return value.substr(0, value.indexOf('::'));
-    },
+    }
   }
 ];
 
