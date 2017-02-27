@@ -71,7 +71,7 @@
           "Ref": "LaunchConfig"
         },
         "MinSize": "1",
-        "MaxSize": "3",
+        "MaxSize": "4",
         "LoadBalancerNames": [
           {
             "Ref": "ElasticLoadBalancer"
@@ -477,6 +477,14 @@
         "Runtime": "nodejs4.3"
       }
     },
+    "PermissionForEventsToInvokeLambda": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": { "Ref": "PublishMqttMessageLambda" },
+        "Action": "lambda:InvokeFunction",
+        "Principal": "*"
+      }
+    },
     "MiniCloudUser": {
       "Type": "AWS::IAM::User",
       "Properties": {
@@ -521,7 +529,9 @@
                     "iot:Subscribe"
                   ],
                   "Resource": [
-                    { "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/miniCloudMonitorTopic" }
+                    {
+                      "Fn::Sub": "arn:aws:iot:${AWS::Region}:${AWS::AccountId}:topic/miniCloudMonitorTopic"
+                    }
                   ]
                 }
               ]
@@ -539,6 +549,84 @@
         }
       }
     },
+    "GreenEventRule": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Green state when AutoScaling successfully launches or terminates an instance",
+        "EventPattern": {
+          "source": [
+            "aws.autoscaling"
+          ],
+          "detail-type": [
+            "EC2 Instance Launch Successful",
+            "EC2 Instance Terminate Successful"
+          ],
+          "detail": {
+            "AutoScalingGroupName": [
+              "Ref": "WebServerGroup"
+            ]
+          }
+        },
+        "State": "ENABLED",
+        "Targets": [{
+          "Arn": { "Fn::GetAtt": ["PublishMqttMessageLambda", "Arn"] },
+          "Id": "PublishMqttMessageFunction",
+          "Input": "{\"colour\":\"ffffff\"}"
+        }]
+      }
+    },
+    "YellowEventRule": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Yellow state when AutoScaling is taking action",
+        "EventPattern": {
+          "source": [
+            "aws.autoscaling"
+          ],
+          "detail-type": [
+            "EC2 Instance-launch Lifecycle Action",
+            "EC2 Instance-terminate Lifecycle Action"
+          ],
+          "detail": {
+            "AutoScalingGroupName": [
+              "Ref": "WebServerGroup"
+            ]
+          }
+        },
+        "State": "ENABLED",
+        "Targets": [{
+          "Arn": { "Fn::GetAtt": ["PublishMqttMessageLambda", "Arn"] },
+          "Id": "PublishMqttMessageFunction",
+          "Input": "{\"colour\":\"ffee00\"}"
+        }]
+      }
+    },
+    "RedEventRule": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Red state when AutoScaling needs to take action",
+        "EventPattern": {
+          "source": [
+            "aws.ec2"
+          ],
+          "detail-type": [
+            "EC2 Instance State-change Notification"
+          ],
+          "detail": {
+            "state": [
+              "shutting-down",
+              "terminated"
+            ]
+          }
+        },
+        "State": "ENABLED",
+        "Targets": [{
+          "Arn": { "Fn::GetAtt": ["PublishMqttMessageLambda", "Arn"] },
+          "Id": "PublishMqttMessageFunction",
+          "Input": "{\"colour\":\"ff0000\"}"
+        }]
+      }
+    }
   },
   "Outputs": {
     "URL": {
