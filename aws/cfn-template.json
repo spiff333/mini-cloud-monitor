@@ -552,18 +552,17 @@
     "GreenEventRule": {
       "Type": "AWS::Events::Rule",
       "Properties": {
-        "Description": "Green state when AutoScaling successfully launches or terminates an instance",
+        "Description": "Green state when EC2 instance is running.",
         "EventPattern": {
           "source": [
-            "aws.autoscaling"
+            "aws.ec2"
           ],
           "detail-type": [
-            "EC2 Instance Launch Successful",
-            "EC2 Instance Terminate Successful"
+            "EC2 Instance State-change Notification"
           ],
           "detail": {
-            "AutoScalingGroupName": [
-              "Ref": "WebServerGroup"
+            "state": [
+              "running"
             ]
           }
         },
@@ -578,18 +577,17 @@
     "YellowEventRule": {
       "Type": "AWS::Events::Rule",
       "Properties": {
-        "Description": "Yellow state when AutoScaling is taking action",
+        "Description": "Yellow state when EC2 instance is pending.",
         "EventPattern": {
           "source": [
-            "aws.autoscaling"
+            "aws.ec2"
           ],
           "detail-type": [
-            "EC2 Instance-launch Lifecycle Action",
-            "EC2 Instance-terminate Lifecycle Action"
+            "EC2 Instance State-change Notification"
           ],
           "detail": {
-            "AutoScalingGroupName": [
-              "Ref": "WebServerGroup"
+            "state": [
+              "pending"
             ]
           }
         },
@@ -604,7 +602,7 @@
     "RedEventRule": {
       "Type": "AWS::Events::Rule",
       "Properties": {
-        "Description": "Red state when AutoScaling needs to take action",
+        "Description": "Red state when EC2 instance is shutting down or terminated.",
         "EventPattern": {
           "source": [
             "aws.ec2"
