@@ -22,8 +22,8 @@ const MQTT_JSON_KEY = 'colour';
 const AWS_REGION = 'ap-southeast-2';
 
 const ALL_OK_STATUS_COLOUR = 'ffffff';
-const ERROR_STATUS_COLOUR = 'ff0000';
-const TEST_STATUS_COLOUR = '0000ff';
+//const ERROR_STATUS_COLOUR = 'ff0000';
+//const TEST_STATUS_COLOUR = '0000ff';
 
 
 //
@@ -43,35 +43,39 @@ var device;
 var connectedToAws = false;
 function openMqttConnection() {
   device = awsiot.device({
-    clientId: 'MiniCloudMonitor-' + (Math.floor((Math.random() * 100000) + 1)), region: AWS_REGION, protocol: 'wss', port: 443, debug: false
+    clientId: 'MiniCloudMonitor-' + (Math.floor((Math.random() * 100000) + 1)),
+    region: AWS_REGION,
+    protocol: 'wss',
+    port: 443,
+    debug: false
   });
 
   device.on('connect', function() {
     connectedToAws = true;
-    device.subscribe(MQTT_TOPIC);
     winston.log('info', 'Connected to AWS IoT MQTT Topic: ' + MQTT_TOPIC);
+    device.subscribe(MQTT_TOPIC);
   });
 
   device.on('message', function(topic, payload) {
-    console.log(payload.toString());
     if (port && topic == MQTT_TOPIC && payload) {
+      winston.log('info', 'AWS IoT MQTT message received: ' + payload.toString().replace(/\s/g,''));
+
       var message = JSON.parse(payload);
       if (message.hasOwnProperty(MQTT_JSON_KEY)) {
         setMiniCloudMonitorColour(message[MQTT_JSON_KEY]);
         return;
       }
     }
-    winston.log('info', 'AWS IoT MQTT message received: ' + payload.toString().replace(/\s/g,''));
   });
 
   device.on('close', function () {
-    connectedToAws = false;
     winston.log('info', 'AWS IoT MQTT connection closed.');
+    connectedToAws = false;
   });
 
   device.on('error', function (err) {
-    device.end();
     winston.log('error', 'Error connecting to AWS IoT MQTT: ' + err);
+    device.end();
   })
 }
 

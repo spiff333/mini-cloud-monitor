@@ -12,8 +12,7 @@
     "IotRestApiEndpoint": {
       "Description": "The IoT Rest API endpoint specific to this account.",
       "Type": "String",
-      "MinLength": "29",
-      "MaxLength": "50",
+      "AllowedPattern" : "([a-z0-9]{1,20})\\.iot\\.([a-z0-9\\-]{1,15})\\.amazonaws\\.com",
       "ConstraintDescription": "Must be in the format {identifier}.iot.{region}.amazonaws.com. Use 'aws iot describe-endpoint' in the CLI."
     }
   },
@@ -442,7 +441,7 @@
       "Properties": {
         "Environment": {
           "Variables" : {
-            "MQTT_ENDPOINT": "a3ry5eo3klsw3b.iot.ap-southeast-2.amazonaws.com",
+            "MQTT_ENDPOINT": { "Ref": "IotRestApiEndpoint" },
             "MQTT_TOPIC": "miniCloudMonitorTopic"
           }
         },

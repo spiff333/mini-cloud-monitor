@@ -36,7 +36,7 @@ void setup() {
   BlinkM_writeScript( blinkm_addr, 0, script1_len, 0, script1_lines);
   */
 
-  BlinkM_playScript( blinkm_addr, 0, 0, 0 );
+  BlinkM_playScript(blinkm_addr, 0, 0, 0);
 
   Serial.begin(9600);  // initialize serial connection
   inputString.reserve(200);
@@ -54,7 +54,8 @@ void loop() {
       byte g = number >> 8 & 0xFF;
       byte b = number & 0xFF;
 
-      BlinkM_fadeToRGB(blinkm_addr, r, g, b);
+      BlinkM_stopScript(blinkm_addr);
+      BlinkM_fadeToRGB (blinkm_addr, r, g, b);
       inputString = "";
 
     } else {
