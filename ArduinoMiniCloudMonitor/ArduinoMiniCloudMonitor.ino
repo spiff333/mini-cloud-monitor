@@ -1,8 +1,7 @@
 /*
  * MiniCloudMonitor
  * 
- * A NodeJS application that opens a USB serial connection to a RGB LED light,
- * displaying AWS CloudWatch events triggered by AWS IoT MQTT events.
+ * Opens a serial connection to receive colour values to be displayed by the BlinkM RGB LED.
  * Based on BlinkM examples.
  * 
  * BlinkM connections to Arduino
@@ -18,9 +17,8 @@
 #include "Wire.h"
 #include "BlinkM_funcs.h"
 
-const byte blinkm_addr = 0x09;   // i2c address of your BlinkM
+const byte blinkm_addr = 0x09;   // BlinkM i2c address
 String inputString = "";         // a string to hold incoming data
-boolean stringComplete = false;  // whether the string is complete
 
 
 void setup() {
@@ -45,35 +43,23 @@ void setup() {
 }
 
 
-void serialEventRun(void) {
-  if (Serial.available()) serialEvent();
-}
-
-
-void serialEvent() {
+void loop() {
   while (Serial.available()) {
     char inChar = (char)Serial.read();
-    inputString += inChar;
+
     if (inChar == '\n') {
-      stringComplete = true;
+      long number = strtol(inputString.c_str(), NULL, 16);
+
+      byte r = number >> 16;
+      byte g = number >> 8 & 0xFF;
+      byte b = number & 0xFF;
+
+      BlinkM_fadeToRGB(blinkm_addr, r, g, b);
+      inputString = "";
+
+    } else {
+      inputString += inChar;
     }
-  }
-}
-
-
-void loop() {
-  if (stringComplete) {
-    long number = strtol(inputString.c_str(), NULL, 16);
-
-    byte r = number >> 16;
-    byte g = number >> 8 & 0xFF;
-    byte b = number & 0xFF;
-
-    BlinkM_stopScript(blinkm_addr);
-    BlinkM_fadeToRGB(blinkm_addr, r, g, b);
-
-    inputString = "";
-    stringComplete = false;
   }
 }
 
