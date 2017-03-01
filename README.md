@@ -16,8 +16,8 @@ This repository holds the source code for a NodeJS application that
 interfaces between AWS and the USB connected monitor. As Well as Arduino
 sketches and a template for AWS CloudFormation.
 
-Further information including pictures and schematics can be found at hackster.io
+Further information including pictures and schematics can be found at [hackster.io][hackster-url]
 
 [minicloudmonitor-image]: minicloudmonitor.png
 [minicloudmonitor-url]: https://github.com/spiff333/mini-cloud-monitor
-[hackster-url]: http://hackster.io
+[hackster-url]: https://www.hackster.io/spiff333/mini-cloud-monitor-with-aws-arduino-828e55
